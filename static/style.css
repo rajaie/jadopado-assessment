@@ -1,11 +1,25 @@
 body {
-	background: blue;
+	background: #F2F2F2;
+	padding: 0;
+	margin: 0;	
 }
 #container {
 	width: 800px;
 	background: white;
+	height: 100%;
 	margin: 0 auto;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	padding: 0 5px;
+}
+h1 {
+	margin: 0;
+	padding: 15px 0 0;
 }
 form {
 	margin: 0 auto;
+	text-align: center;
+}
+form input {
+	margin: 3px auto;
 }
