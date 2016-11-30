@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from hashlib import sha256
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
+heroku = Heroku(app)
 db = SQLAlchemy(app)
 
 class User(db.Model):
