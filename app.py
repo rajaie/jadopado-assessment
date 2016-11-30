@@ -1,5 +1,6 @@
 from flask import Flask, render_template, session, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_heroku import Heroku
 from hashlib import sha256
 
 app = Flask(__name__)
