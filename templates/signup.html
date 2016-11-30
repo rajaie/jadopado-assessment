@@ -6,15 +6,33 @@
 <body>
 <div id="container">
 	<h1 align="center">Sign Up</h1>
-	<p align="right">Already have an account? <a href="{{ url_for('login') }}">Login</a> now.</p>
+	<p align="right" class="hint">Already have an account? <a href="{{ url_for('login') }}">Login</a> now</p>
+	<p>
+		<ol>
+		<li>All fields are required</li>
+		<li>Download, install, and sign up for Authy on your device</li>
+		<li>Please use the same email and telephone used for your Authy account</li>
+		</ol>
+	</p>
 	<form method=post action="{{ url_for('signup') }}">
 		<div>
+			<label>Name</label>
 			<input placeholder="Name" name="name" type="text" required />
 		</div>
+
 		<div>
+			<label>E-mail</label>
 			<input placeholder="E-mail" name="email" type="email" required />
-		</div>
+		</div>		
+			
 		<div>
+			<label>Telephone</label>
+			<input placeholder="Country Code" name="country_code" type="number" required id="country_code" />
+			<input placeholder="Area Code + Telephone" name="phone" type="tel" required />
+		</div>
+
+		<div>
+			<label>Password</label>		
 			<input placeholder="Password" name="password" type="password" required />
 		</div>
 <!-- 		<div>

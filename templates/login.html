@@ -6,18 +6,30 @@
 <body>
 <div id="container">
 	<h1 align="center">Login</h1>
-	<p align="right">Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a> now.</p>
-	<form method=post action="{{ url_for('login') }}">
-		<div>
-			<input placeholder="E-mail" name="email" type="email" required />
-		</div>
-		<div>
-			<input placeholder="Password" name="password" type="password" required />
-		</div>
-		<div>
-			<input type="submit" value="Login" />
-		</div>
-	</form>
+	{% if not session.logged_in %}
+		<p class="hint" align="right">Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a> now</p>
+		<p>
+		To login, please:
+			<ol>
+			<li>Complete the form below with your username/password</li>
+			<li>Enter your Authy token on the following page</li>
+			<li>Approve the Authy authentication request on your device</li>
+			</ol>			
+		</p>
+		<form method=post action="{{ url_for('login') }}">
+			<div>
+				<input placeholder="E-mail" name="email" type="email" required />
+			</div>
+			<div>
+				<input placeholder="Password" name="password" type="password" required />
+			</div>
+			<div>
+				<input type="submit" value="Login" />
+			</div>
+		</form>
+	{% else %}
+		<p align="center">You are already logged in. Want to <a href="{{ url_for('logout') }}">logout</a>?</p>
+	{% endif %}
 </div>
 </body>
 </html>

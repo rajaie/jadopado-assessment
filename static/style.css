@@ -1,5 +1,7 @@
 body {
 	background: #F2F2F2;
+	font-family: Arial;
+	font-size: 14px;
 	padding: 0;
 	margin: 0;	
 }
@@ -15,6 +17,9 @@ body {
 h1 {
 	margin: 0;
 	padding: 15px 0 0;
+}
+p.hint {
+	font-size: 10px;
 }
 form {
 	margin: 0 auto;

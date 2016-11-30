@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title>TOTP Authy</title>
+	<link rel="stylesheet" href="../static/style.css"
+</head>
+<body>
+<div id="container">
+	<h1 align="center">TOTP Authy</h1>
+	<p align="center">Please enter your JADOPADO-ASSESSMENT Authy token below:</p>
+	<form method=post action="{{ url_for('totp') }}">
+		<div>
+			<label>Token (7 digits)</label>
+			<input placeholder="Authy Token" name="token" type="text" required />
+		</div>
+		<div>
+			<input type="submit" value="Verify" />
+		</div>
+	</form>
+</div>
+</body>
+</html>
