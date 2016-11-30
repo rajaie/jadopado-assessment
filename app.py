@@ -3,6 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from hashlib import sha256
 
+#TODO
+#input validation & sanitization
+#   ensure all fields filled out
+#   name only contains letters
+#   server-side validation
+
 app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
 heroku = Heroku(app)
