@@ -2,9 +2,8 @@ from flask import Flask, render_template, session, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from hashlib import sha256
-
+import requests
 from authy.api import AuthyApiClient
-authy_api = AuthyApiClient('MVZQaKGv2n8k94T377n6bamoVpn3TGEB')
 
 #TODO
 #input validation & sanitization
@@ -12,8 +11,12 @@ authy_api = AuthyApiClient('MVZQaKGv2n8k94T377n6bamoVpn3TGEB')
 #   name only contains letters
 #   server-side validation
 
+AUTHY_API_KEY = "MVZQaKGv2n8k94T377n6bamoVpn3TGEB"
+authy_api = AuthyApiClient(AUTHY_API_KEY)
+
 app = Flask(__name__)
 app.secret_key = 'Ajoj(*039483jlkjer093#$J#4j343'
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
 heroku = Heroku(app)
 db = SQLAlchemy(app)
@@ -45,6 +48,25 @@ def hashpw(password):
 
 def is_token_formatted(token):
     return True
+
+def send_onetouch_request(authy_id):
+    url = "http://api.authy.com/onetouch/json/users/{}/approval_requests".format(authy_id)
+    data = {'message': 'Login requested for JADOPADO assessment site'}
+    headers = {'X-Authy-API-Key': AUTHY_API_KEY}
+
+    r = requests.post(url, headers=headers, data=data)
+    # OneTouch request created successfully
+    if r.status_code == 200:
+        return r.json()['approval_request']['uuid']
+
+def verify_onetouch_request(uuid):
+    url = "http://api.authy.com/onetouch/json/approval_requests/{}".format(uuid)
+    headers = {'X-Authy-API-Key': AUTHY_API_KEY}
+
+    r = requests.get(url, headers=headers)
+    # Retrieved OneTouch authentication status
+    if r.status_code == 200:
+        return r.json()['approval_request']['status']
 
 ########## VIEWS ###############
 
@@ -107,6 +129,7 @@ def login():
 def logout():
     session.pop('logged_in', None)
     session.pop('authy_id', None)
+    session.pop('onetouch_uuid', None)
     return redirect(url_for('index'))
 
 # Authy TOTP
@@ -115,7 +138,7 @@ def totp():
     authy_id = session.get('authy_id', None)
 
     if request.method == 'POST':
-        token =  request.form['token']
+        token = request.form['token']
 
         # Token not formatted properly
         if not is_token_formatted(token):
@@ -126,11 +149,31 @@ def totp():
         # Send token verification request to Authy
         verification = authy_api.tokens.verify(authy_id, token)
         if verification.ok():
-            session['logged_in'] = True
-            return "Token verified. Login complete."
+            session.pop('onetouch_uuid', None)
+            return redirect(url_for('onetouch'))
         else:
             message = "Incorrect token, <a href='" + \
                        url_for('totp') + "'>try again</a>"
             return message
 
     return render_template('totp.html')
+
+# Authy OneTouch
+@app.route('/onetouch')
+def onetouch():
+    authy_id = session.get('authy_id', None)
+    onetouch_uuid = session.get('onetouch_uuid', None)
+
+    if onetouch_uuid is None:
+        uuid = send_onetouch_request(authy_id)
+        session['onetouch_uuid'] = uuid
+    else:
+        response = verify_onetouch_request(session['onetouch_uuid'])
+        if response == "approved":
+            session['logged_in'] = True
+        else:
+            return "You have not approved the OneTouch request yet, please approve " \
+                   "it and reload this page.<br /><br /> If you denied the request, " \
+                   "please restart the <a href='" + url_for('login') + "'>login</a> process."
+
+    return render_template('onetouch.html')

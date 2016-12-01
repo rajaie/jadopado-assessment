@@ -1,0 +1,20 @@
+<html>
+<head>
+	<title>OneTouch Authy</title>
+	<link rel="stylesheet" href="../static/style.css"
+</head>
+<body>
+<div id="container">
+	<h1 align="center">OneTouch Authy</h1>
+	{% if not session.logged_in %}
+		<p>To complete your login, please:</p>
+		<ol>
+			<li>Approve the Authy request on your device</li>
+			<li>Refresh this page afterwards</li>
+		</ol>
+	{% else %}
+		<p align="center">Congratulations, you are now logged in. Want to <a href="{{ url_for('logout') }}">logout</a>?</p>
+	{% endif %}	
+</div>
+</body>
+</html>

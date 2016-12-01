@@ -6,16 +6,20 @@
 <body>
 <div id="container">
 	<h1 align="center">TOTP Authy</h1>
-	<p align="center">Please enter your JADOPADO-ASSESSMENT Authy token below:</p>
-	<form method=post action="{{ url_for('totp') }}">
-		<div>
-			<label>Token (7 digits)</label>
-			<input placeholder="Authy Token" name="token" type="text" required />
-		</div>
-		<div>
-			<input type="submit" value="Verify" />
-		</div>
-	</form>
+	{% if not session.logged_in %}		
+		<p align="center">Please enter your JADOPADO-ASSESSMENT Authy token below:</p>
+		<form method=post action="{{ url_for('totp') }}">
+			<div>
+				<label>Token (7 digits)</label>
+				<input placeholder="Authy Token" name="token" type="text" required />
+			</div>
+			<div>
+				<input type="submit" value="Verify" />
+			</div>
+		</form>
+	{% else %}
+		<p align="center">You are already logged in. Want to <a href="{{ url_for('logout') }}">logout</a>?</p>
+	{% endif %}	
 </div>
 </body>
 </html>

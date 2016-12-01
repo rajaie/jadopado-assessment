@@ -6,8 +6,13 @@
 <body>
 <div id="container">
 	<h1 align="center">Welcome</h1>
-	<p align="center">Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>  now</p>
-	<p align="center">Already have an account? <a href="{{ url_for('login') }}">Login</a> now</p>
+	{% if not session.logged_in %}
+		<p align="center">Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>  now</p>
+		<p align="center">Already have an account? <a href="{{ url_for('login') }}">Login</a> now</p>
+	{% else %}
+		<p align="center">You are currently logged in.</p>
+		<p><a href="{{ url_for('logout') }}">Logout</a> of your account</p>
+	{% endif %}	
 </div>
 </body>
 </html>
