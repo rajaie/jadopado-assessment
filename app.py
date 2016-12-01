@@ -17,7 +17,7 @@ authy_api = AuthyApiClient(AUTHY_API_KEY)
 app = Flask(__name__)
 app.secret_key = 'Ajoj(*039483jlkjer093#$J#4j343'
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
+app.#config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 
@@ -95,7 +95,7 @@ def signup():
         if not User.query.filter_by(email=email).count():
             db.session.add(newUser)
             db.session.commit()
-            return "Signup successful".format(email, password)
+            return "Signup successful, want to <a href='" + url_for('login') + "'>login</a>?"
         else:
             return "Email already exists"
 
