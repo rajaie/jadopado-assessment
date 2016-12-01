@@ -17,7 +17,7 @@ authy_api = AuthyApiClient(AUTHY_API_KEY)
 app = Flask(__name__)
 app.secret_key = 'Ajoj(*039483jlkjer093#$J#4j343'
 
-app.#config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://human:password@localhost/jadopado'
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 
