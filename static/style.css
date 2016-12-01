@@ -28,3 +28,7 @@ form {
 form input {
 	margin: 3px auto;
 }
+
+#country_code {
+	width: 110px;
+}

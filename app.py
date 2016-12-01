@@ -3,13 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from hashlib import sha256
 import requests
+import re
 from authy.api import AuthyApiClient
-
-#TODO
-#input validation & sanitization
-#   ensure all fields filled out
-#   name only contains letters
-#   server-side validation
 
 AUTHY_API_KEY = "MVZQaKGv2n8k94T377n6bamoVpn3TGEB"
 authy_api = AuthyApiClient(AUTHY_API_KEY)
@@ -46,9 +41,6 @@ class User(db.Model):
 def hashpw(password):
     return sha256(password.encode('ascii')).hexdigest()
 
-def is_token_formatted(token):
-    return True
-
 def send_onetouch_request(authy_id):
     url = "http://api.authy.com/onetouch/json/users/{}/approval_requests".format(authy_id)
     data = {'message': 'Login requested for JADOPADO assessment site'}
@@ -68,6 +60,57 @@ def verify_onetouch_request(uuid):
     if r.status_code == 200:
         return r.json()['approval_request']['status']
 
+def validate_name(name):
+    if re.match(r"^[a-zA-Z][a-zA-Z\s]{1,100}$", name) is not None:
+        return True
+    else:
+        return False
+
+def validate_email(email):
+    if re.match(r"[^@]+@[^@]+\.[^@]+", email) is not None:
+        return True
+    else:
+        return False
+
+def validate_phone(phone):
+    if re.match(r"^[0-9]{6,30}$", phone) is not None:
+        return True
+    else:
+        return False
+
+def validate_country_code(country_code):
+    if re.match(r"^[0-9]{1,3}$", country_code) is not None:
+        return True
+    else:
+        return False
+
+def validate_token(token):
+    if re.match(r"^[0-9]{7}$", token) is not None:
+        return True
+    else:
+        return False
+
+# Returns False if no errors were found, otherwise returns an error message.
+def validate_signup_fields(email, name, password, country_code, phone):
+    if email == "" or name == "" or password == "" or country_code == "" \
+            or phone == "":
+        return "Please go back and fill out all fields."
+    if not validate_email(email):
+        return "Bad email format, go back and try again"
+    if not validate_name(name):
+        return "Bad name format, go back and try again"
+    if not validate_country_code(country_code):
+        return "Bad country code format, go back and try again"
+    if not validate_phone(phone):
+        return "Bad phone format, go back and try again"
+    return False
+
+def validate_login_fields(email, password):
+    if email == "" or password == "":
+        return "Please go back and fill out all fields."
+    if not validate_email(email):
+        return "Bad email format, go back and try again"
+
 ########## VIEWS ###############
 
 # Index
@@ -86,18 +129,24 @@ def signup():
         country_code = request.form['country_code']
         phone = request.form['phone']
 
-        authyUser = authy_api.users.create(email, phone, country_code)
-        if not authyUser.ok():
-            return "Authy user creation failed"
-        newUser = User(email, name, password_hash, country_code, phone, authyUser.id)
+        # All fields must be filled in and valid. Return error message otherwise.
+        not_valid = validate_signup_fields(email, name, password, country_code, phone)
+        if not_valid:
+            return not_valid
+
+        # Only add user to DB if Authy user creation succeeds
+        authy_user = authy_api.users.create(email, phone, country_code)
+        if not authy_user.ok():
+            return "Authy user creation failed, go back and try again"
+        new_user = User(email, name, password_hash, country_code, phone, authy_user.id)
 
         # Email address must be unique
         if not User.query.filter_by(email=email).count():
-            db.session.add(newUser)
+            db.session.add(new_user)
             db.session.commit()
             return "Signup successful, want to <a href='" + url_for('login') + "'>login</a>?"
         else:
-            return "Email already exists"
+            return "Email already exists, go back and try again"
 
     return render_template('signup.html')
 
@@ -105,8 +154,13 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # All fields must be filled in and valid. Return error message otherwise.
+        not_valid = validate_login_fields(email, password)
+        if not_valid:
+            return not_valid
 
         user = User.query.filter_by(email=email).first()
         if user is None:
@@ -141,7 +195,7 @@ def totp():
         token = request.form['token']
 
         # Token not formatted properly
-        if not is_token_formatted(token):
+        if not validate_token(token):
             message = "Bad token format, <a href='" + \
                        url_for('totp') + "'>try again</a>"
             return message

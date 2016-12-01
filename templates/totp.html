@@ -11,7 +11,7 @@
 		<form method=post action="{{ url_for('totp') }}">
 			<div>
 				<label>Token (7 digits)</label>
-				<input placeholder="Authy Token" name="token" type="text" required />
+				<input placeholder="Authy Token" name="token" type="text" pattern="[0-9]{7}" required />
 			</div>
 			<div>
 				<input type="submit" value="Verify" />

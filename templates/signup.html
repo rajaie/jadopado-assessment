@@ -17,27 +17,28 @@
 		</p>
 		<form method=post action="{{ url_for('signup') }}">
 			<div>
-				<label>Name</label>
-				<input placeholder="Name" name="name" type="text" required />
+			<label>Name (alphabet + space chars only / 100 chars max)</label><br >
+			<input placeholder="Name" name="name" type="text" pattern="[a-zA-Z][a-zA-Z\s]{1,100}" required />
 			</div>
 
 			<div>
-				<label>E-mail</label>
-				<input placeholder="E-mail" name="email" type="email" required />
+			<label>E-mail</label><br >
+			<input placeholder="E-mail" name="email" type="email" required />
 			</div>		
 				
 			<div>
-				<label>Telephone</label>
-				<input placeholder="Country Code" name="country_code" type="number" required id="country_code" />
-				<input placeholder="Area Code + Telephone" name="phone" type="tel" required />
+			<label>Telephone (1-3 numbers)(numbers only, no spaces/dashes)</label><br />
+			<input placeholder="Country Code" name="country_code" type="text" required id="country_code" pattern="[0-9]{1,3}" />
+			<input placeholder="Area Code + Telephone" name="phone" type="tel" pattern="[0-9]*" required />
 			</div>
 
 			<div>
-				<label>Password</label>		
-				<input placeholder="Password" name="password" type="password" required />
+			<label>Password</label><br >
+			<input placeholder="Password" name="password" type="password" required />
 			</div>
+
 			<div>
-				<input type="submit" value="Sign Up" />
+			<input type="submit" value="Sign Up" />
 			</div>
 		</form>
 	{% else %}
